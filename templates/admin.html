@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin - Quản lý danh sách máy</title>
+    <style>
+      /* ========================= CẤU HÌNH CSS ========================= */
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 20px;
+      }
+
+      h1,
+      h2 {
+        color: #333;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background: #4caf50;
+        color: white;
+      }
+
+      button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      button:hover {
+        background: #367c39;
+      }
+
+      .delete-btn {
+        background: red;
+      }
+
+      .delete-btn:hover {
+        background: darkred;
+      }
+
+      input {
+        padding: 5px;
+        margin-right: 10px;
+      }
+
+      .flash {
+        color: green;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      /* Định dạng màu cho trạng thái hết hạn */
+      .expired {
+        color: red;
+        font-weight: bold;
+      }
+
+      .active {
+        color: green;
+        font-weight: bold;
+      }
+
+      .permanent {
+        color: #4caf50;
+        font-weight: bold;
+      }
+
+      form {
+        display: inline;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ========================= TIÊU ĐỀ ========================= -->
+    <h1>Quản lý danh sách máy hợp lệ</h1>
+
+    <!-- Flash message thông báo thành công -->
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="flash">{{ messages[0] }}</div>
+    {% endif %} {% endwith %}
+
+    <!-- ========================= DANH SÁCH MÁY CHỜ DUYỆT ========================= -->
+    <h2>Danh sách máy chờ duyệt</h2>
+    <table>
+      <tr>
+        <th>Hostname</th>
+        <th>MAC Address</th>
+        <th>Hết hạn</th>
+        <th>Hành động</th>
+      </tr>
+      {% for machine in pending_machines %}
+      <tr>
+        <td>{{ machine.hostname }}</td>
+        <td>{{ machine.mac }}</td>
+        <td>
+          <form action="/approve_machine/{{ machine.mac }}" method="post">
+            <input type="datetime-local" name="expiry_date" required />
+            <button type="submit">✔️ Duyệt</button>
+          </form>
+        </td>
+        <td>
+          <a href="/delete_pending/{{ machine.mac }}">
+            <button class="delete-btn">❌ Xóa</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <!-- ========================= DANH SÁCH MÁY HỢP LỆ ========================= -->
+    <h2>Danh sách máy hợp lệ</h2>
+    <table border="1">
+      <tr>
+        <th>Hostname</th>
+        <th>MAC Address</th>
+        <th>Ngày hết hạn</th>
+        <th>Hành động</th>
+      </tr>
+      {% for machine in allowed_machines %}
+      <tr>
+        <td>{{ machine.hostname }}</td>
+        <td>{{ machine.mac }}</td>
+        <td>
+          <form
+            action="{{ url_for('edit_expiry', mac=machine.mac) }}"
+            method="post"
+            style="display: inline"
+          >
+            <input
+              type="datetime-local"
+              name="new_expiry_date"
+              value="{{ machine.expiry_date.replace(' ', 'T') }}"
+              required
+            />
+            <button type="submit">💾 Lưu</button>
+          </form>
+        </td>
+        <td>
+          <a href="{{ url_for('delete_machine', mac=machine.mac) }}">❌ Xóa</a>
+          |
+          <a href="{{ url_for('set_permanent', mac=machine.mac) }}"
+            >⭐ Vĩnh viễn</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <!-- ========================= FORM THÊM MÁY THỦ CÔNG ========================= -->
+    <h2>Thêm máy mới (thủ công)</h2>
+    <form action="/add_machine" method="post">
+      <input type="text" name="hostname" placeholder="Hostname" required />
+      <input type="text" name="mac" placeholder="MAC Address" required />
+      <button type="submit">Thêm máy</button>
+    </form>
+  </body>
+</html>
+
+<a
+  href="/logout"
+  style="float: right; margin-top: -40px; color: red; font-weight: bold"
+  >👋 Đăng xuất</a
+>
