@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 # Cấu hình PostgreSQL trên Render
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://owuser:Qc9OYFY59ALRpweuRuBpbRQpQ6AiW5GU@dpg-cvnjjg3uibrs738bepi0-a/ow_arsm"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://owuser:cZPqSF4cDyCmeB18Kr6YG4Pn8S6MQuIo@dpg-cvd6819c1ekc73au9290-a/ow_ywkc"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Import Database & Models
